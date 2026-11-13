@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from starlette.middleware.sessions import SessionMiddleware
 
 from dsa_gaming.core.config import ROOT, get_settings
+from dsa_gaming.core.database import asyncpg_connect
 from dsa_gaming.core.logging import configure_logging
 from dsa_gaming.modules.gameplay.router import router as gameplay_router
 from dsa_gaming.modules.identity.router import admin_router
@@ -35,7 +36,8 @@ async def lifespan(app: FastAPI):
     if settings.database_configured:
         try:
             await asyncio.to_thread(upgrade_database)
-            engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+            database_url, connect_args = asyncpg_connect(settings.database_url)
+            engine = create_async_engine(database_url, connect_args=connect_args, pool_pre_ping=True)
             app.state.engine = engine
             app.state.sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
         except Exception:
