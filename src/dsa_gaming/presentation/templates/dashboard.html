@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Arena · DSA Gaming Engine{% endblock %}
+{% block body %}
+<main class="home">
+  <header class="home-bar">
+    <p class="mark">DSA Gaming Engine</p>
+    <form method="post" action="/auth/logout">
+      <button class="text-btn" type="submit">Log out</button>
+    </form>
+  </header>
+  <section class="home-card">
+    <div class="who">
+      {% if user.picture %}
+      <img class="avatar" src="{{ user.picture }}" alt="" />
+      {% endif %}
+      <div>
+        <h1>{{ user.name }}</h1>
+        <p class="lede">{{ user.email }}</p>
+      </div>
+    </div>
+    <p class="quiet">Pick a track. Each one is 20 tasks in a single 120 minute sitting.</p>
+    <div class="tracks">
+      <a class="track" href="/app/dsa">
+        <span class="track-kicker">DSA</span>
+        <strong>20 mind games</strong>
+        <span>13 languages{% if language_name %} · {{ language_name }}{% endif %}</span>
+      </a>
+      <a class="track" href="/app/sql">
+        <span class="track-kicker">SQL</span>
+        <strong>20 query tasks</strong>
+        <span>Database marathon</span>
+      </a>
+    </div>
+  </section>
+</main>
+{% endblock %}

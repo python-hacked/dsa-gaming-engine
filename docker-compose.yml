@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: dsa
+      POSTGRES_PASSWORD: dsa
+      POSTGRES_DB: dsa_gaming
+    ports:
+      - "5432:5432"
+    volumes:
+      - dsa_pg:/var/lib/postgresql/data
+
+volumes:
+  dsa_pg:

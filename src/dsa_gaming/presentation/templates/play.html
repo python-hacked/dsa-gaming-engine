@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · DSA Gaming Engine{% endblock %}
+{% block body %}
+<main class="home">
+  <header class="home-bar">
+    <a class="mark" href="/app/dsa">DSA Gaming Engine</a>
+    <p id="clock" class="clock" data-expires="{{ expires_at }}">{{ label }} left</p>
+    <form method="post" action="/auth/logout">
+      <button class="text-btn" type="submit">Log out</button>
+    </form>
+  </header>
+  <section class="home-card play-page">
+    <div class="play-layout">
+      <div>
+        <h1>{{ title }}</h1>
+        <p class="lede" id="help"></p>
+        <div id="board" data-round="{{ round_id }}" data-slug="{{ slug }}"></div>
+        <p id="result" class="quiet" role="status"></p>
+        <p class="again"><a href="/play/{{ slug }}?new=1">New puzzle</a></p>
+      </div>
+      <div class="editor">
+        <div class="editor-bar">
+          <span>{{ language_name }}</span>
+          <button id="run" type="button">Run</button>
+        </div>
+        <textarea id="source" spellcheck="false">{{ starter }}</textarea>
+      </div>
+    </div>
+  </section>
+</main>
+<script id="puzzle-data" type="application/json">{{ puzzle_json }}</script>
+<script type="module" src="/static/js/games/{{ slug }}.js"></script>
+{% endblock %}

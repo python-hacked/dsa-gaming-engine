@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}SQL · DSA Gaming Engine{% endblock %}
+{% block body %}
+<main class="home">
+  <header class="home-bar">
+    <a class="mark" href="/app">DSA Gaming Engine</a>
+    <form method="post" action="/auth/logout">
+      <button class="text-btn" type="submit">Log out</button>
+    </form>
+  </header>
+  <section class="home-card wide">
+    <h1>SQL track</h1>
+    <p class="lede">Twenty database tasks. Queries run in a locked sandbox, and only a matching result counts.</p>
+    <ol class="catalog">
+      {% for task in tasks %}
+      <li>
+        <span class="catalog-title">{{ task.title }}</span>
+        <span class="catalog-meta">{{ task.par }}</span>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+</main>
+{% endblock %}

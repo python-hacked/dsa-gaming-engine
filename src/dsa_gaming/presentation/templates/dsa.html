@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}DSA · DSA Gaming Engine{% endblock %}
+{% block body %}
+<main class="home">
+  <header class="home-bar">
+    <a class="mark" href="/app">DSA Gaming Engine</a>
+    <form method="post" action="/auth/logout">
+      <button class="text-btn" type="submit">Log out</button>
+    </form>
+  </header>
+  <section class="home-card wide">
+    <h1>DSA track</h1>
+    <p class="lede">Choose the language for this marathon. The board is the same. The code check is in that language.</p>
+    {% if notice %}
+    <p class="banner" role="alert">{{ notice }}</p>
+    {% endif %}
+    <form class="languages" method="post" action="/app/dsa/language">
+      {% for code, name in languages %}
+      <button class="chip {% if user.active_language == code %}chip-on{% endif %}" type="submit" name="language" value="{{ code }}">{{ name }}</button>
+      {% endfor %}
+    </form>
+    {% if language_name %}
+    {% if marathon %}
+    <p id="clock" class="clock" data-expires="{{ marathon.expires_at }}">{{ marathon.label }} left</p>
+    {% else %}
+    <form method="post" action="/app/dsa/marathon">
+      <button class="start-btn" type="submit">Start 120 minute marathon</button>
+    </form>
+    {% endif %}
+    <h2>20 games · {{ language_name }}</h2>
+    <ol class="catalog">
+      {% for game in games %}
+      <li class="{% if game.slug in playable and marathon %}is-open{% endif %}">
+        {% if game.slug in playable and marathon %}
+        <a href="/play/{{ game.slug }}">
+          <span class="catalog-title">{{ game.title }}</span>
+          <span class="catalog-meta">{% if game.slug in marathon.cleared %}Cleared{% else %}Play{% endif %}</span>
+        </a>
+        {% else %}
+        <span class="catalog-title">{{ game.title }}</span>
+        <span class="catalog-meta">{{ game.topic }} · {{ game.par }}</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <p class="quiet">Pick a language to see the 20 games.</p>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}
