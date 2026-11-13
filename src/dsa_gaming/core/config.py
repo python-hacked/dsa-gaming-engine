@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
 
@@ -37,3 +38,25 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+def gemini_key_from(environ: Mapping[str, str]) -> str:
+    folded = {name.upper(): value for name, value in environ.items()}
+    for name in ("GEMINI_API_KEY", "GOOGLE_API_KEY", "GEMINI_KEY"):
+        value = folded.get(name, "").strip().strip('"').strip("'")
+        if value:
+            return value
+    for name, value in folded.items():
+        cleaned = value.strip().strip('"').strip("'")
+        if "GEMINI" in name and cleaned:
+            return cleaned
+    return ""
+
+
+def gemini_related_names(environ: Mapping[str, str]) -> list[str]:
+    names = []
+    for name in environ:
+        upper = name.upper()
+        if "GEMINI" in upper or upper in {"GOOGLE_API_KEY", "GEMINI_KEY"}:
+            names.append(name)
+    return sorted(names)

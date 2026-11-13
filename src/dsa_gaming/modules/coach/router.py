@@ -1,6 +1,9 @@
+import os
+
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
+from dsa_gaming.core.config import gemini_key_from, gemini_related_names
 from dsa_gaming.modules.catalog.data import DSA_GAMES, editor_language
 from dsa_gaming.modules.coach.repository import performance_line, recent_messages
 from dsa_gaming.modules.coach.service import coach_reply
@@ -46,9 +49,19 @@ async def coach_ask(slug: str, request: Request):
     factory = request.app.state.sessionmaker
     if factory is None:
         return JSONResponse({"detail": "Database is not ready."}, status_code=503)
-    api_key = request.app.state.settings.gemini_api_key.strip()
+    api_key = gemini_key_from(os.environ)
     if not api_key:
-        return JSONResponse({"detail": "The assistant needs a Gemini key."}, status_code=503)
+        found = ", ".join(gemini_related_names(os.environ)) or "none"
+        return JSONResponse(
+            {
+                "detail": (
+                    "This server process has no Gemini key. "
+                    f"Related env names it can see: {found}. "
+                    "On Render, set GEMINI_API_KEY and choose Save and deploy. Save only does not reach the running site."
+                )
+            },
+            status_code=503,
+        )
     body = await request.json()
     message = body.get("message")
     source = body.get("source") if isinstance(body.get("source"), str) else ""

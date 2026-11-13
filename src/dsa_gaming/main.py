@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -10,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from starlette.middleware.sessions import SessionMiddleware
 
-from dsa_gaming.core.config import ROOT, get_settings
+from dsa_gaming.core.config import ROOT, gemini_key_from, gemini_related_names, get_settings
 from dsa_gaming.core.database import asyncpg_connect
 from dsa_gaming.core.logging import configure_logging
 from dsa_gaming.modules.coach.router import router as coach_router
@@ -32,6 +33,11 @@ def upgrade_database() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = app.state.settings
+    logger.info(
+        "Gemini key configured: %s. Related env names: %s",
+        bool(gemini_key_from(os.environ)),
+        ", ".join(gemini_related_names(os.environ)) or "none",
+    )
     app.state.sessionmaker = None
     app.state.engine = None
     if settings.database_configured:
