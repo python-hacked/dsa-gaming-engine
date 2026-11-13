@@ -28,7 +28,19 @@
       </div>
     </div>
   </section>
+  <button class="coach-tab" id="coach-open" type="button" aria-expanded="false" aria-controls="coach-panel">AI assistant</button>
+  <div class="coach-backdrop" hidden></div>
+  <aside class="coach" id="coach-panel" data-slug="{{ slug }}" data-round="{{ round_id }}" aria-hidden="true">
+    <h2>AI assistant</h2>
+    <p class="quiet" id="coach-performance"></p>
+    <div id="coach-log"></div>
+    <form id="coach-form">
+      <textarea name="message" placeholder="Ask for the logic, or ask for the solution."></textarea>
+      <button class="submit-btn" type="submit">Ask</button>
+    </form>
+  </aside>
 </main>
 <script id="puzzle-data" type="application/json">{{ puzzle_json }}</script>
 <script type="module" src="/static/js/games/{{ slug }}.js"></script>
+<script src="/static/js/coach.js"></script>
 {% endblock %}

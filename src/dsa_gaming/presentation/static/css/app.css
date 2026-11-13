@@ -207,6 +207,100 @@ h1 {
   color: var(--lime);
 }
 
+.coach-tab {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  z-index: 30;
+  border: 0;
+  border-radius: 12px 0 0 12px;
+  padding: 16px 10px;
+  background: var(--lime);
+  color: #14160f;
+  font: inherit;
+  font-weight: 700;
+  writing-mode: vertical-rl;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.coach-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.48);
+}
+
+.coach-backdrop[hidden] {
+  display: none;
+}
+
+.coach {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  width: min(460px, 92vw);
+  height: 100%;
+  padding: 28px 22px 22px;
+  background: #14160f;
+  border-left: 1px solid var(--line);
+  box-shadow: -24px 0 48px rgba(0, 0, 0, 0.35);
+  transform: translateX(100%);
+  transition: transform 0.22s ease;
+}
+
+.coach.is-open {
+  transform: translateX(0);
+}
+
+.coach h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+#coach-log {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  margin: 16px 0;
+  overflow: auto;
+}
+
+.coach-bubble {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #191c12;
+  white-space: pre-wrap;
+}
+
+.coach-bubble.user {
+  background: #24281b;
+}
+
+.coach form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.coach textarea {
+  width: 100%;
+  min-height: 72px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #10140c;
+  color: var(--paper);
+  padding: 10px 12px;
+  font: inherit;
+  resize: vertical;
+}
+
 #run {
   border: 0;
   border-radius: 999px;

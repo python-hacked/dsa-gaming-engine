@@ -9,6 +9,7 @@ from dsa_gaming.core.database import Base, asyncpg_connect
 from dsa_gaming.modules.gameplay import models  # noqa: F401
 from dsa_gaming.modules.identity import models  # noqa: F401
 from dsa_gaming.modules.certificates import models  # noqa: F401
+from dsa_gaming.modules.coach import models  # noqa: F401
 
 config = context.config
 _database_url, _connect_args = asyncpg_connect(get_settings().database_url)

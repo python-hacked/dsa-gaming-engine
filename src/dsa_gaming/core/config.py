@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     database_url: str = ""
     piston_api_url: str = "https://emkc.org/api/v2/piston"
     admin_signup_secret: str = ""
+    gemini_api_key: str = ""
 
     @property
     def google_enabled(self) -> bool:

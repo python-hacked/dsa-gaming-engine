@@ -13,6 +13,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from dsa_gaming.core.config import ROOT, get_settings
 from dsa_gaming.core.database import asyncpg_connect
 from dsa_gaming.core.logging import configure_logging
+from dsa_gaming.modules.coach.router import router as coach_router
 from dsa_gaming.modules.gameplay.router import router as gameplay_router
 from dsa_gaming.modules.identity.router import admin_router
 from dsa_gaming.modules.identity.router import router as identity_router
@@ -68,6 +69,7 @@ def create_app() -> FastAPI:
     app.include_router(identity_router)
     app.include_router(admin_router)
     app.include_router(gameplay_router)
+    app.include_router(coach_router)
     return app
 
 
