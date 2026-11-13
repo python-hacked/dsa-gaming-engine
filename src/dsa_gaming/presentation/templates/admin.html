@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Admin · DSA Gaming Engine{% endblock %}
+{% block body %}
+<main class="home">
+  <header class="home-bar">
+    <a class="mark" href="/app/admin">DSA Gaming Engine</a>
+    <div class="bar-actions">{% include "account.html" %}</div>
+  </header>
+  <section class="home-card wide">
+    <h1>Signature</h1>
+    <p class="quiet">One signature is printed on every certificate as Founder &amp; CEO. Drawing or uploading replaces the other.</p>
+    {% if signature_notice %}<p class="banner">{{ signature_notice }}</p>{% endif %}
+    {% if signature.present %}
+    <div class="sign-preview">
+      <img src="{{ signature.src }}" alt="" />
+      <p>{{ signature.name }}</p>
+      <p class="quiet">Founder &amp; CEO</p>
+    </div>
+    {% endif %}
+    <div class="sign-grid">
+      <form id="sign-draw-form" method="post" action="/app/admin/signature">
+        <label>Name
+          <input name="signer_name" value="{{ signature.name or user.name }}" required />
+        </label>
+        <p class="quiet">Draw</p>
+        <canvas id="sign-pad" width="840" height="280"></canvas>
+        <input type="hidden" name="drawn" id="sign-drawn" />
+        <div class="sign-actions">
+          <button class="text-btn" type="button" id="sign-clear">Clear</button>
+          <button class="submit-btn" type="submit">Save drawn signature</button>
+        </div>
+      </form>
+      <form method="post" action="/app/admin/signature" enctype="multipart/form-data">
+        <label>Name
+          <input name="signer_name" value="{{ signature.name or user.name }}" required />
+        </label>
+        <p class="quiet">Upload</p>
+        <input name="upload" type="file" accept="image/png,image/jpeg,image/webp" required />
+        <div class="sign-actions">
+          <button class="submit-btn" type="submit">Upload signature</button>
+        </div>
+      </form>
+    </div>
+    <h1>Players</h1>
+    <p class="quiet">{{ players|length }} accounts. Unlock writes the certificate open on that player's profile.</p>
+    {% for person in players %}
+    <article class="player-card">
+      <div class="player-head">
+        {% if person.picture %}
+        <img class="avatar avatar-sm" src="{{ person.picture }}" alt="" />
+        {% else %}
+        <span class="avatar avatar-sm avatar-fallback">{{ (person.name or "?")[:1] }}</span>
+        {% endif %}
+        <div>
+          <h2>{{ person.name }}</h2>
+          <p class="quiet">{{ person.email or "No email" }}{% if person.role == "admin" %} · Admin{% endif %}</p>
+        </div>
+      </div>
+      <ul class="player-stats">
+        <li>Joined {{ person.joined }}</li>
+        <li>Language: {{ person.language_name }}</li>
+        <li>{% if person.logins %}{% if person.online %}Online now · {% endif %}Time logged in {{ person.time_online }} · {{ person.logins }} login{% if person.logins != 1 %}s{% endif %}{% else %}No login recorded yet{% endif %}</li>
+        <li>DSA tasks cleared: {{ person.tasks }} · Passed attempts: {{ person.attempts }}</li>
+        <li>{% if person.sitting is not none %}This sitting: {{ person.sitting }} of {{ total }}{% else %}No active sitting{% endif %}</li>
+      </ul>
+      <p class="quiet">Logins</p>
+      <ul class="login-log">
+        {% for visit in person.visits %}
+        <li>{{ visit.when }} · {{ visit.length }}{% if visit.open %} · online{% endif %}</li>
+        {% else %}
+        <li>No login yet</li>
+        {% endfor %}
+      </ul>
+      {% for name in person.issued_names %}
+      <p class="granted">Certificate unlocked · {{ name }}</p>
+      {% endfor %}
+      {% if person.unlock_language not in person.issued_codes %}
+      <form method="post" action="/app/admin/users/{{ person.id }}/certificate">
+        <input type="hidden" name="language" value="{{ person.unlock_language }}" />
+        <button class="submit-btn" type="submit">Unlock certificate</button>
+      </form>
+      {% endif %}
+    </article>
+    {% else %}
+    <p class="quiet">No users yet.</p>
+    {% endfor %}
+  </section>
+</main>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/signature.js"></script>
+{% endblock %}

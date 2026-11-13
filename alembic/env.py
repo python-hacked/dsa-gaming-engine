@@ -8,6 +8,7 @@ from dsa_gaming.core.config import get_settings
 from dsa_gaming.core.database import Base
 from dsa_gaming.modules.gameplay import models  # noqa: F401
 from dsa_gaming.modules.identity import models  # noqa: F401
+from dsa_gaming.modules.certificates import models  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", get_settings().database_url)

@@ -18,7 +18,7 @@
   <section class="panel">
     <p class="mark">DSA Gaming Engine</p>
     <h1>Sign in to enter the arena.</h1>
-    <p class="lede">Google is the only way in. The name on your certificate is the name on this account.</p>
+    <p class="lede">Players sign in with Google. The name on your certificate is the name on this account.</p>
 
     {% if error %}
     <p class="banner" role="alert">{{ error }}</p>
@@ -34,8 +34,23 @@
       Continue with Google
     </a>
 
+    <details class="admin-login"{% if admin_open %} open{% endif %}>
+      <summary>Admin login</summary>
+      <form method="post" action="/auth/admin/login">
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="username" required />
+        </label>
+        <label>
+          Password
+          <input name="password" type="password" autocomplete="current-password" required />
+        </label>
+        <button class="admin-submit" type="submit">Sign in</button>
+      </form>
+    </details>
+
     {% if user %}
-    <a class="resume" href="/app">Continue as {{ user.name }}</a>
+    <a class="resume" href="{% if user.role == 'admin' %}/app/admin{% else %}/app{% endif %}">Continue as {{ user.name }}</a>
     {% endif %}
   </section>
 </main>

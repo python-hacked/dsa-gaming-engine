@@ -1,0 +1,25 @@
+<div class="cert-sheet{% if blurred %} is-blurred{% endif %}">
+  <div class="award-head">
+    <div class="award-seal" aria-hidden="true"><span>DSA</span></div>
+    <div>
+      <p class="award-brand">DSA Gaming Engine</p>
+      <h2>Certificate of completion</h2>
+    </div>
+  </div>
+  <p class="award-line">Proudly awarded to</p>
+  <p class="cert-name">{{ holder_name|default(user.name) }}</p>
+  <p class="award-for">for successfully completing the DSA marathon in {{ language_name }}</p>
+  <div class="award-foot">
+    <div>
+      {% if issued_on %}<p>Date: {{ issued_on }}</p>{% endif %}
+      {% if cert_id %}<p>Certificate ID: {{ cert_id }}</p>{% endif %}
+    </div>
+    <div class="award-sign">
+      {% if signature.present %}
+      <img src="{{ signature.src }}" alt="" />
+      <p class="signer">{{ signature.name }}</p>
+      {% endif %}
+      <p>Founder &amp; CEO</p>
+    </div>
+  </div>
+</div>

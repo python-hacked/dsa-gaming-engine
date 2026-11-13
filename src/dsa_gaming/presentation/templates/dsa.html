@@ -4,9 +4,7 @@
 <main class="home">
   <header class="home-bar">
     <a class="mark" href="/app">DSA Gaming Engine</a>
-    <form method="post" action="/auth/logout">
-      <button class="text-btn" type="submit">Log out</button>
-    </form>
+    <div class="bar-actions">{% include "account.html" %}</div>
   </header>
   <section class="home-card wide">
     <h1>DSA track</h1>

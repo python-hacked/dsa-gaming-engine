@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     google_redirect_uri: str = "http://127.0.0.1:8000/auth/google/callback"
     database_url: str = ""
     piston_api_url: str = "https://emkc.org/api/v2/piston"
+    admin_signup_secret: str = ""
 
     @property
     def google_enabled(self) -> bool:

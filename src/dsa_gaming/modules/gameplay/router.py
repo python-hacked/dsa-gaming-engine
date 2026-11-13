@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
-from dsa_gaming.modules.gameplay.repository import active_run, get_round, save_attempt
-from dsa_gaming.modules.gameplay.service import PLAYABLE, answer_from_code, grade
+from dsa_gaming.modules.catalog.data import editor_language
+from dsa_gaming.modules.gameplay.repository import active_run, get_round, save_attempt, use_language
+from dsa_gaming.modules.gameplay.service import PLAYABLE, answer_from_code, grade, program_input
 from dsa_gaming.modules.identity.service import remember_google_user
-from dsa_gaming.modules.runner.service import RunError, execute_source, parse_trace
+from dsa_gaming.modules.runner.service import RunError, execute_source, interpret_output
 
 router = APIRouter(prefix="/api/play", tags=["gameplay"])
 
@@ -35,7 +36,14 @@ async def submit_play(slug: str, request: Request):
         if puzzle.status == "passed":
             return {"passed": True, "score": 100, "detail": "Already cleared."}
         result = grade(slug, puzzle.payload, body)
-        moves = body.get("swaps") if slug == "array-swap" else body.get("path")
+        if slug == "array-swap":
+            moves = body.get("swaps")
+        elif slug == "stack-brackets":
+            moves = body.get("bad")
+        elif slug == "queue-flood":
+            moves = body.get("cells")
+        else:
+            moves = body.get("path")
         if result.passed or puzzle.status == "open":
             await save_attempt(session, puzzle, moves if isinstance(moves, list) else [], result.score, result.passed)
     return {"passed": result.passed, "score": result.score, "detail": result.detail}
@@ -66,9 +74,10 @@ async def run_code(slug: str, request: Request):
         if puzzle is None or puzzle.slug != slug:
             return JSONResponse({"passed": False, "detail": "This round is closed."}, status_code=404)
         if puzzle.status == "passed":
-            return {"passed": True, "score": 100, "detail": "Already cleared.", "swaps": [], "path": []}
+            return {"passed": True, "score": 100, "detail": "Already cleared.", "order": [], "swaps": [], "path": [], "bad": []}
+        language = await use_language(session, run, editor_language(user.get("active_language"), run.language))
         try:
-            stdout, stderr, _code = await execute_source(run.language, source)
+            stdout, stderr, _code = await execute_source(language, source, program_input(slug, puzzle.payload))
         except RunError as exc:
             return {
                 "passed": False,
@@ -76,26 +85,45 @@ async def run_code(slug: str, request: Request):
                 "detail": exc.stderr or exc.detail,
                 "stdout": exc.stdout,
                 "stderr": exc.stderr,
+                "order": [],
                 "swaps": [],
                 "path": [],
+                "bad": [],
             }
         try:
-            trace = parse_trace(stdout)
+            trace = interpret_output(slug, stdout)
         except RunError as exc:
+            detail = stderr.strip() or exc.detail
+            if stdout.strip() and not stderr.strip():
+                detail = exc.detail + " Program printed: " + stdout.strip()[:300]
             return {
                 "passed": False,
                 "score": 0,
-                "detail": stderr or exc.detail,
+                "detail": detail,
                 "stdout": stdout,
                 "stderr": stderr,
+                "order": [],
                 "swaps": [],
                 "path": [],
+                "bad": [],
             }
+        order: list = []
+        swaps: list = []
+        path: list = []
+        bad: list = []
+        cells: list = []
         if slug == "array-swap":
             result, order = answer_from_code(puzzle.payload["tiles"], trace)
             moves = order
             swaps = trace.get("swaps") if isinstance(trace.get("swaps"), list) else []
-            path: list = []
+        elif slug == "stack-brackets":
+            bad = trace.get("bad") if isinstance(trace.get("bad"), list) else []
+            result = grade(slug, puzzle.payload, {"bad": bad})
+            moves = bad
+        elif slug == "queue-flood":
+            cells = trace.get("cells") if isinstance(trace.get("cells"), list) else []
+            result = grade(slug, puzzle.payload, {"cells": cells})
+            moves = cells
         else:
             path = trace.get("path") if isinstance(trace.get("path"), list) else []
             if not path:
@@ -108,11 +136,10 @@ async def run_code(slug: str, request: Request):
                     "order": [],
                     "swaps": [],
                     "path": [],
+                    "bad": [],
                 }
             result = grade(slug, puzzle.payload, trace)
             moves = path
-            swaps = []
-            order = []
         await save_attempt(session, puzzle, moves, result.score, result.passed)
     return {
         "passed": result.passed,
@@ -121,6 +148,8 @@ async def run_code(slug: str, request: Request):
         "order": order,
         "swaps": swaps,
         "path": path,
+        "bad": bad,
+        "cells": cells,
         "stdout": stdout,
         "stderr": stderr,
     }

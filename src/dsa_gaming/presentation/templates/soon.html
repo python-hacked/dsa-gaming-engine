@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · DSA Gaming Engine{% endblock %}
+{% block body %}
+<main class="home">
+  <header class="home-bar">
+    <a class="mark" href="/app/dsa">DSA Gaming Engine</a>
+    <p id="clock" class="clock" data-expires="{{ expires_at }}">{{ label }} left</p>
+    <div class="bar-actions">{% include "account.html" %}</div>
+  </header>
+  <section class="home-card play-page">
+    <h1>{{ title }}</h1>
+    <p class="lede">{{ topic }} · {{ par }}</p>
+    <p class="quiet">This task is next. The board for it is not open yet.</p>
+    <p class="again"><a href="{{ next_href }}">Next task</a></p>
+  </section>
+</main>
+{% endblock %}

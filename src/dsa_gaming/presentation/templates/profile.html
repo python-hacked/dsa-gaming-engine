@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Profile · DSA Gaming Engine{% endblock %}
+{% block body %}
+<main class="home">
+  <header class="home-bar">
+    <a class="mark" href="/app">DSA Gaming Engine</a>
+    <div class="bar-actions">{% include "account.html" %}</div>
+  </header>
+  <section class="home-card">
+    <div class="who">
+      {% if user.picture %}
+      <img class="avatar" src="{{ user.picture }}" alt="" />
+      {% else %}
+      <span class="avatar avatar-fallback">{{ (user.name or "?")[:1] }}</span>
+      {% endif %}
+      <div>
+        <h1>{{ user.name }}</h1>
+        <p class="lede">{{ user.email }}</p>
+        {% if language_name %}<p class="quiet">{{ language_name }}</p>{% endif %}
+      </div>
+    </div>
+    <p class="quiet">{{ done }} of {{ total }} DSA tasks cleared in this sitting.</p>
+    {% for card in certificates %}
+    <article class="cert-wrap">
+      {% with blurred=not card.ready, language_name=card.language_name, issued_on=card.issued_on, cert_id=card.public_id %}
+      {% include "certificate_sheet.html" %}
+      {% endwith %}
+      {% if card.ready %}
+      <div class="cert-actions">
+        <a class="submit-btn" href="{{ card.download_href }}">Download</a>
+        <a class="text-btn" href="{{ card.share_href }}" target="_blank" rel="noopener">Share on LinkedIn</a>
+      </div>
+      {% else %}
+      <div class="cert-lock">
+        <span class="lock-mark" aria-hidden="true"></span>
+        <strong>Locked</strong>
+        <p>Finish this {{ card.language_name }} sitting to unlock the certificate.</p>
+      </div>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </section>
+</main>
+{% endblock %}

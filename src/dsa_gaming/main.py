@@ -13,6 +13,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from dsa_gaming.core.config import ROOT, get_settings
 from dsa_gaming.core.logging import configure_logging
 from dsa_gaming.modules.gameplay.router import router as gameplay_router
+from dsa_gaming.modules.identity.router import admin_router
 from dsa_gaming.modules.identity.router import router as identity_router
 from dsa_gaming.modules.identity.service import build_oauth
 from dsa_gaming.presentation.pages import router as pages_router
@@ -63,6 +64,7 @@ def create_app() -> FastAPI:
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
     app.include_router(pages_router)
     app.include_router(identity_router)
+    app.include_router(admin_router)
     app.include_router(gameplay_router)
     return app
 

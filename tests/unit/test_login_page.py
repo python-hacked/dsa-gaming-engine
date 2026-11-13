@@ -9,6 +9,8 @@ def test_root_is_google_login():
     assert response.status_code == 200
     assert "Continue with Google" in response.text
     assert 'href="/auth/google/login"' in response.text
+    assert "Admin login" in response.text
+    assert 'action="/auth/admin/login"' in response.text
 
 
 def test_arena_sends_guests_back_to_login():

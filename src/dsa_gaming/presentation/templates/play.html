@@ -5,9 +5,7 @@
   <header class="home-bar">
     <a class="mark" href="/app/dsa">DSA Gaming Engine</a>
     <p id="clock" class="clock" data-expires="{{ expires_at }}">{{ label }} left</p>
-    <form method="post" action="/auth/logout">
-      <button class="text-btn" type="submit">Log out</button>
-    </form>
+    <div class="bar-actions">{% include "account.html" %}</div>
   </header>
   <section class="home-card play-page">
     <div class="play-layout">
@@ -16,7 +14,10 @@
         <p class="lede" id="help"></p>
         <div id="board" data-round="{{ round_id }}" data-slug="{{ slug }}"></div>
         <p id="result" class="quiet" role="status"></p>
-        <p class="again"><a href="/play/{{ slug }}?new=1">New puzzle</a></p>
+        <p class="again">
+          <a id="submit" class="submit-btn" href="{{ next_href }}" {% if not cleared %}hidden{% endif %}>Submit</a>
+          <a href="/play/{{ slug }}?new=1">New puzzle</a>
+        </p>
       </div>
       <div class="editor">
         <div class="editor-bar">

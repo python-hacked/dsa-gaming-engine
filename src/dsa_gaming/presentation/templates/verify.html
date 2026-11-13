@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ language_name }} certificate · DSA Gaming Engine{% endblock %}
+{% block body %}
+<main class="home">
+  <header class="home-bar">
+    <a class="mark" href="/">DSA Gaming Engine</a>
+  </header>
+  <section class="home-card">
+    <article class="cert-wrap">
+      {% with blurred=false, language_name=language_name, issued_on=issued_on, holder_name=holder_name, cert_id=cert_id, user={"name": holder_name} %}
+      {% include "certificate_sheet.html" %}
+      {% endwith %}
+      <div class="cert-actions">
+        <a class="submit-btn" href="{{ download_href }}">Download</a>
+        <a class="text-btn" href="{{ share_href }}" target="_blank" rel="noopener">Share on LinkedIn</a>
+      </div>
+    </article>
+  </section>
+</main>
+{% endblock %}

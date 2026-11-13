@@ -13,17 +13,19 @@
 
 html, body {
   margin: 0;
-  min-height: 100%;
+  height: 100%;
 }
 
 body {
+  overflow-y: auto;
   font-family: "Bricolage Grotesque", "Avenir Next", sans-serif;
   background: var(--ink);
   color: var(--paper);
 }
 
 .stage {
-  min-height: 100vh;
+  min-height: 100%;
+  height: 100%;
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
 }
@@ -92,6 +94,7 @@ body {
   justify-content: center;
   padding: 64px 56px;
   background: var(--panel);
+  overflow: auto;
 }
 
 .mark {
@@ -166,7 +169,16 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 }
+
+.bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-link { display: inline-flex; line-height: 0; }
 
 .home-card {
   max-width: 720px;
@@ -355,7 +367,7 @@ h1 {
   cursor: pointer;
 }
 
-.tile.is-on {
+.tile.is-on, .tile.is-bad {
   background: var(--lime);
   color: #14160f;
 }
@@ -378,13 +390,27 @@ h1 {
 }
 
 .cell.is-wall { background: #0b0d09; }
-.cell.is-path { background: #3c4324; }
+.cell.is-path, .cell.is-flood { background: #3c4324; }
 .cell.is-player { background: var(--paper); }
 .cell.is-goal { box-shadow: inset 0 0 0 3px var(--lime); }
 .cell.is-player.is-goal { background: var(--lime); }
 
 .again { margin-top: 18px; }
 .again a { color: var(--lime); }
+.submit-btn {
+  display: inline-block;
+  margin-right: 16px;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 16px;
+  background: var(--lime);
+  color: #14160f;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.submit-btn[hidden] { display: none; }
 
 .catalog-title { font-weight: 700; }
 .catalog-meta {
@@ -406,6 +432,254 @@ h2 {
   object-fit: cover;
 }
 
+.avatar-sm { width: 36px; height: 36px; }
+
+.avatar-fallback {
+  display: grid;
+  place-items: center;
+  background: var(--lime);
+  color: #14160f;
+  font-weight: 700;
+}
+
+.cert-wrap {
+  position: relative;
+  margin-top: 28px;
+  max-width: 760px;
+}
+
+.cert-sheet {
+  position: relative;
+  overflow: hidden;
+  padding: 36px 40px 28px;
+  border: 14px solid #1d4ed8;
+  outline: 2px solid #f5c451;
+  outline-offset: -18px;
+  border-radius: 6px;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+}
+
+.cert-sheet.is-blurred {
+  filter: blur(5px);
+  user-select: none;
+}
+
+.award-head {
+  display: grid;
+  grid-template-columns: 90px 1fr 90px;
+  align-items: center;
+}
+
+.award-seal {
+  width: 74px;
+  height: 74px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe38a, #e0a325 55%, #b8860b);
+  box-shadow: 0 0 0 6px #fff, 0 0 0 8px #e0a325;
+  color: #7a4b00;
+  font-weight: 800;
+}
+
+.award-brand,
+.award-line,
+.award-for {
+  margin: 0;
+  text-align: center;
+}
+
+.award-brand {
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cert-sheet h2 {
+  margin: 8px 0 18px;
+  color: #1d4ed8;
+  font-size: clamp(26px, 4vw, 42px);
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.award-line {
+  color: #5b6472;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.cert-sheet .cert-name {
+  margin: 8px 0 12px;
+  color: #111827;
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.05;
+  text-align: center;
+}
+
+.award-for {
+  color: #374151;
+  font-size: 16px;
+}
+
+.award-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
+  margin-top: 28px;
+}
+
+.award-foot p {
+  margin: 0;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.award-sign {
+  min-width: 180px;
+  text-align: center;
+}
+
+.award-sign img {
+  display: block;
+  max-width: 180px;
+  max-height: 64px;
+  margin: 0 auto 4px;
+  object-fit: contain;
+}
+
+.award-sign .signer {
+  font-family: "Iowan Old Style", Palatino, serif;
+  font-size: 20px;
+}
+
+.sign-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 22px;
+  margin: 18px 0 28px;
+}
+
+.sign-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.sign-grid input[type="text"],
+.sign-grid input:not([type="file"]) {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #14160f;
+  color: var(--paper);
+  padding: 10px 12px;
+  font: inherit;
+}
+
+#sign-pad {
+  width: 100%;
+  height: 140px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.sign-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.sign-preview {
+  width: fit-content;
+  margin: 12px 0;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: #fff;
+  color: #111827;
+  text-align: center;
+}
+
+.sign-preview img {
+  display: block;
+  max-width: 220px;
+  max-height: 72px;
+  margin: 0 auto 4px;
+}
+
+.sign-preview p {
+  margin: 0;
+}
+
+.cert-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.cert-lock {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  border-radius: 18px;
+  background: rgba(20, 22, 15, 0.28);
+  color: #f4f1e6;
+}
+
+.cert-lock strong {
+  font-size: 22px;
+  text-shadow: 0 2px 12px #14160f;
+}
+
+.cert-lock p {
+  margin: 0;
+  max-width: 240px;
+  text-shadow: 0 2px 12px #14160f;
+}
+
+.lock-mark {
+  display: block;
+  width: 54px;
+  height: 40px;
+  margin-bottom: 8px;
+  border: 3px solid #f4f1e6;
+  border-radius: 8px;
+  background: #14160f;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  position: relative;
+}
+
+.lock-mark::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: -22px;
+  height: 22px;
+  border: 3px solid #f4f1e6;
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+}
+
 .quiet {
   color: var(--muted);
 }
@@ -418,14 +692,105 @@ h2 {
   padding: 8px 14px;
   font: inherit;
   cursor: pointer;
+  text-decoration: none;
 }
 
+.admin-login {
+  margin-top: 28px;
+  max-width: 320px;
+}
+
+.admin-login summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--lime);
+  font-size: 14px;
+}
+
+.admin-login form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.admin-login label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.admin-login input {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #14160f;
+  color: var(--paper);
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 16px;
+}
+
+.admin-submit {
+  margin-top: 4px;
+  width: fit-content;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: var(--lime);
+  color: #14160f;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.player-card {
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #191c12;
+}
+
+.player-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.player-card h2 { margin: 0; font-size: 22px; }
+.player-card .quiet { margin: 2px 0 0; }
+
+.player-stats {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.player-stats li { margin-top: 4px; }
+
+.login-log {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.player-card form { margin: 14px 0 0; }
+.granted { color: var(--lime); font-weight: 700; }
+
 @media (max-width: 860px) {
-  .stage { grid-template-columns: 1fr; }
+  .stage { grid-template-columns: 1fr; height: auto; min-height: 100%; }
   .board { min-height: 240px; }
-  .panel { padding: 36px 24px 64px; }
+  .panel { max-height: none; padding: 36px 24px 64px; }
   .board-grid { mask-image: none; }
   .tracks, .catalog, .play-layout { grid-template-columns: 1fr; }
   .home { padding: 20px 16px 48px; }
+  .award-head { grid-template-columns: 64px 1fr 12px; }
+  .award-seal { width: 56px; height: 56px; }
+  .award-foot { flex-direction: column; align-items: center; text-align: center; }
+  .sign-grid { grid-template-columns: 1fr; }
+  .cert-sheet .cert-name { font-size: 28px; }
   #source { min-height: 280px; }
 }

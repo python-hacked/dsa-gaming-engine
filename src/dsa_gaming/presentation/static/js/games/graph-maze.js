@@ -40,6 +40,7 @@ function paint() {
 
 function show(body) {
   result.textContent = body.passed ? "Cleared. " + body.detail + " Score " + body.score + "." : body.detail;
+  if (body.passed) document.querySelector("#submit").hidden = false;
 }
 
 async function finish() {

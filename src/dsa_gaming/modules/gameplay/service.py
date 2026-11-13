@@ -4,7 +4,9 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 MARATHON_SECONDS = 120 * 60
-PLAYABLE = {"array-swap", "graph-maze"}
+PLAYABLE = {"array-swap", "graph-maze", "stack-brackets", "queue-flood"}
+_PAIRS = {"(": ")", "[": "]", "{": "}"}
+_CLOSER = {")": "(", "]": "[", "}": "{"}
 _DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))
 
 
@@ -160,7 +162,9 @@ def grade_maze(walls: list[list[bool]], path: list, optimal: int) -> Grade:
         if cell is None:
             return Grade(False, 0, "That path is not valid.")
         row, col = cell
-        if not (0 <= row < rows and 0 <= col < cols) or walls[row][col]:
+        if not (0 <= row < rows and 0 <= col < cols):
+            return Grade(False, 0, "The path leaves the maze.")
+        if walls[row][col]:
             return Grade(False, 0, "The path goes through a wall.")
         parsed.append((row, col))
     if parsed[0] != (0, 0) or parsed[-1] != (rows - 1, cols - 1):
@@ -178,10 +182,130 @@ def grade_maze(walls: list[list[bool]], path: list, optimal: int) -> Grade:
     return Grade(True, score, detail)
 
 
+def unmatched(brackets: str) -> list[int]:
+    stack: list[tuple[str, int]] = []
+    bad: list[int] = []
+    for index, char in enumerate(brackets):
+        if char in _PAIRS:
+            stack.append((char, index))
+        elif char in _CLOSER:
+            if stack and stack[-1][0] == _CLOSER[char]:
+                stack.pop()
+            else:
+                bad.append(index)
+        else:
+            bad.append(index)
+    bad.extend(index for _char, index in stack)
+    return bad
+
+
+def new_brackets(rng: random.Random | None = None) -> dict:
+    rng = rng or random.Random()
+    opens = list(_PAIRS)
+    chars: list[str] = []
+    stack: list[str] = []
+    target = rng.choice((6, 8, 8, 10))
+    while len(chars) < target:
+        if stack and (len(chars) + len(stack) >= target or rng.random() < 0.45):
+            chars.append(_PAIRS[stack.pop()])
+        else:
+            opener = rng.choice(opens)
+            stack.append(opener)
+            chars.append(opener)
+    while stack:
+        chars.append(_PAIRS[stack.pop()])
+    alphabet = "()[]{}"
+    for _flip in range(rng.randint(1, 2)):
+        index = rng.randrange(len(chars))
+        chars[index] = rng.choice([char for char in alphabet if char != chars[index]])
+    brackets = "".join(chars)
+    bad = unmatched(brackets)
+    if not bad:
+        return new_brackets(rng)
+    return {"brackets": brackets, "bad": bad}
+
+
+def grade_brackets(expected: list[int], reported) -> Grade:
+    if not isinstance(reported, list):
+        return Grade(False, 0, "Print the indexes that do not match.")
+    indexes: list[int] = []
+    for item in reported:
+        if isinstance(item, bool) or not isinstance(item, int):
+            return Grade(False, 0, "Indexes have to be numbers.")
+        indexes.append(item)
+    if sorted(set(indexes)) != sorted(set(expected)):
+        return Grade(False, 0, "Those are not the broken brackets.")
+    return Grade(True, 100, f"{len(expected)} brackets do not match.")
+
+
+def reachable(walls: list[list[bool]], start: tuple[int, int] = (0, 0)) -> list[list[int]]:
+    rows, cols = len(walls), len(walls[0])
+    if walls[start[0]][start[1]]:
+        return []
+    queue: deque[tuple[int, int]] = deque([start])
+    seen = {start}
+    while queue:
+        row, col = queue.popleft()
+        for d_row, d_col in _DIRS:
+            nxt = (row + d_row, col + d_col)
+            if nxt in seen or not (0 <= nxt[0] < rows and 0 <= nxt[1] < cols):
+                continue
+            if walls[nxt[0]][nxt[1]]:
+                continue
+            seen.add(nxt)
+            queue.append(nxt)
+    return [[row, col] for row, col in seen]
+
+
+def new_flood(rng: random.Random | None = None) -> dict:
+    rng = rng or random.Random()
+    size = 5
+    for _attempt in range(20):
+        walls = [[rng.random() < 0.28 and (row, col) != (0, 0) for col in range(size)] for row in range(size)]
+        cells = reachable(walls)
+        if len(cells) >= 4:
+            return {"walls": walls, "start": [0, 0], "reach": cells}
+    walls = [[False] * size for _ in range(size)]
+    return {"walls": walls, "start": [0, 0], "reach": reachable(walls)}
+
+
+def grade_flood(expected: list, reported) -> Grade:
+    if not isinstance(reported, list):
+        return Grade(False, 0, "Print every open cell the flood reaches.")
+    found: set[tuple[int, int]] = set()
+    for item in reported:
+        if not isinstance(item, (list, tuple)) or len(item) != 2:
+            return Grade(False, 0, "Each cell needs a row and a column.")
+        row, col = item
+        if isinstance(row, bool) or isinstance(col, bool) or not isinstance(row, int) or not isinstance(col, int):
+            return Grade(False, 0, "Each cell needs a row and a column.")
+        found.add((row, col))
+    wanted = {(row, col) for row, col in expected}
+    if found != wanted:
+        return Grade(False, 0, "The flood has not covered the open cells.")
+    return Grade(True, 100, f"Flooded {len(wanted)} cells.")
+
+
 def public_payload(payload: dict) -> dict:
     shown = dict(payload)
     shown.pop("optimal", None)
+    shown.pop("bad", None)
+    shown.pop("reach", None)
     return shown
+
+
+def program_input(slug: str, payload: dict) -> str:
+    if slug == "array-swap":
+        return " ".join(str(number) for number in payload["tiles"]) + "\n"
+    if slug == "graph-maze":
+        rows = ["".join("#" if cell else "." for cell in row) for row in payload["walls"]]
+        return "\n".join(rows) + "\n"
+    if slug == "stack-brackets":
+        return payload["brackets"] + "\n"
+    if slug == "queue-flood":
+        rows = ["".join("#" if cell else "." for cell in row) for row in payload["walls"]]
+        return "\n".join(rows) + "\n"
+    return ""
 
 
 def new_puzzle(slug: str, rng: random.Random | None = None) -> dict:
@@ -189,6 +313,10 @@ def new_puzzle(slug: str, rng: random.Random | None = None) -> dict:
         return new_array(rng)
     if slug == "graph-maze":
         return new_maze(rng)
+    if slug == "stack-brackets":
+        return new_brackets(rng)
+    if slug == "queue-flood":
+        return new_flood(rng)
     raise KeyError(slug)
 
 
@@ -197,4 +325,8 @@ def grade(slug: str, payload: dict, body: dict) -> Grade:
         return grade_array(payload["tiles"], body.get("swaps", []), payload["swap_limit"])
     if slug == "graph-maze":
         return grade_maze(payload["walls"], body.get("path", []), payload["optimal"])
+    if slug == "stack-brackets":
+        return grade_brackets(payload["bad"], body.get("bad", []))
+    if slug == "queue-flood":
+        return grade_flood(payload["reach"], body.get("cells", []))
     return Grade(False, 0, "This game is not open yet.")

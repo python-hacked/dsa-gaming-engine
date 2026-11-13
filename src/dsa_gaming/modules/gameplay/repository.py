@@ -18,6 +18,13 @@ async def active_run(session: AsyncSession, user_id: int, now: datetime | None =
     return result.scalars().first()
 
 
+async def use_language(session: AsyncSession, run: MarathonRun, language: str) -> str:
+    if run.language != language:
+        run.language = language
+        await session.commit()
+    return language
+
+
 async def start_run(session: AsyncSession, user_id: int, language: str) -> MarathonRun:
     current = await active_run(session, user_id)
     if current is not None:

@@ -36,6 +36,7 @@ function sorted() {
 
 function show(body) {
   result.textContent = body.passed ? "Cleared. " + body.detail : body.detail;
+  if (body.passed) document.querySelector("#submit").hidden = false;
 }
 
 async function finish() {

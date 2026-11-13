@@ -1,0 +1,13 @@
+{% if user.role == "admin" %}
+<a class="text-btn" href="/app/admin">Admin</a>
+{% endif %}
+<a class="profile-link" href="/app/profile" aria-label="Profile">
+  {% if user.picture %}
+  <img class="avatar avatar-sm" src="{{ user.picture }}" alt="" />
+  {% else %}
+  <span class="avatar avatar-sm avatar-fallback">{{ (user.name or "?")[:1] }}</span>
+  {% endif %}
+</a>
+<form method="post" action="/auth/logout">
+  <button class="text-btn" type="submit">Log out</button>
+</form>

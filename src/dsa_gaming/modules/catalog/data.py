@@ -16,6 +16,15 @@ LANGUAGES = [
 
 LANGUAGE_IDS = {code for code, _name in LANGUAGES}
 
+
+def editor_language(active: str | None, run_language: str) -> str:
+    """The language chip wins. The marathon keeps the language it started with until then."""
+    if active in LANGUAGE_IDS:
+        return active
+    if run_language in LANGUAGE_IDS:
+        return run_language
+    return "python"
+
 DSA_GAMES = [
     {"slug": "array-swap", "title": "Array Swap Sort", "topic": "Array", "par": "90 sec"},
     {"slug": "graph-maze", "title": "Graph Maze", "topic": "Graph", "par": "2 min"},
