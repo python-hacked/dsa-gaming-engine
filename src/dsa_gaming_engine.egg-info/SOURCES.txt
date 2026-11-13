@@ -19,10 +19,12 @@ src/dsa_gaming/modules/catalog/schemas.py
 src/dsa_gaming/modules/catalog/service.py
 src/dsa_gaming/modules/certificates/__init__.py
 src/dsa_gaming/modules/certificates/models.py
+src/dsa_gaming/modules/certificates/pdf.py
 src/dsa_gaming/modules/certificates/repository.py
 src/dsa_gaming/modules/certificates/router.py
 src/dsa_gaming/modules/certificates/schemas.py
 src/dsa_gaming/modules/certificates/service.py
+src/dsa_gaming/modules/certificates/signature.py
 src/dsa_gaming/modules/coach/__init__.py
 src/dsa_gaming/modules/coach/models.py
 src/dsa_gaming/modules/coach/repository.py
@@ -53,6 +55,7 @@ src/dsa_gaming/modules/runner/repository.py
 src/dsa_gaming/modules/runner/router.py
 src/dsa_gaming/modules/runner/schemas.py
 src/dsa_gaming/modules/runner/service.py
+src/dsa_gaming/modules/runner/starters.py
 src/dsa_gaming/modules/sql_lab/__init__.py
 src/dsa_gaming/modules/sql_lab/models.py
 src/dsa_gaming/modules/sql_lab/repository.py

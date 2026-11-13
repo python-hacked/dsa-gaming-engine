@@ -15,6 +15,7 @@ Requires-Dist: sqlalchemy[asyncio]>=2.0
 Requires-Dist: asyncpg>=0.30
 Requires-Dist: alembic>=1.14
 Requires-Dist: python-multipart>=0.0.12
+Requires-Dist: fpdf2>=2.8
 Provides-Extra: dev
 Requires-Dist: pytest>=8; extra == "dev"
 Requires-Dist: pytest-asyncio>=0.24; extra == "dev"
